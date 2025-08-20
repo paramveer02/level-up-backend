@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import bcrypt from "bcryptjs";
 
 export const userSchema = new mongoose.Schema({
   name: {
@@ -37,6 +38,30 @@ export const userSchema = new mongoose.Schema({
   avatarPublicId: String,
   passwordChangedAt: Date,
 });
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+});
+
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  hashedPassword
+) {
+  return await bcrypt.compare(candidatePassword, hashedPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTissuedAt) {
+  if (!this.passwordChangedAt) return false;
+
+  const passwordChangedAtTimestamp = parseInt(
+    this.passwordChangedAt.getTime() / 1000,
+    10
+  );
+
+  return JWTissuedAt < passwordChangedAtTimestamp;
+};
 
 const User = mongoose.model("User", userSchema);
 export default User;
