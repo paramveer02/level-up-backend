@@ -49,11 +49,6 @@ app.get("/health", (_, res) => res.status(200).send("ok"));
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 
-// test route
-app.get("/test", (req, res) => {
-  res.send("You are now Authenticated & Authorization");
-});
-
 // error handler
 app.use(notFound);
 app.use(errorHandler);
