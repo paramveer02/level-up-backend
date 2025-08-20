@@ -5,7 +5,9 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
+    "start": "node server.js",
     "dev": "NODE_ENV=development nodemon server.js",
+    "project-setup": "npm i",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
