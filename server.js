@@ -1,5 +1,6 @@
 import { app } from "./app.js";
 import morgan from "morgan";
+import "./dbConfig/db.js";
 
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
