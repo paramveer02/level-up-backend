@@ -39,6 +39,9 @@ app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+// Healthcheck
+app.get("/health", (_, res) => res.status(200).send("ok"));
+
 // routes
 app.get("/api/v1/test", (req, res) => {
   res.send("TESTING successful!");
