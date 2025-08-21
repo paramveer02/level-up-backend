@@ -9,6 +9,7 @@ import errorHandler from "./middlewares/errorHandler.js";
 import { authRouter } from "./routes/authRouter.js";
 import { authenticate, restrict } from "./middlewares/authenticate.js";
 import { userRouter } from "./routes/userRouter.js";
+import aiRouter from "./routes/aiRouter.js";
 
 export const app = express();
 app.set("trust proxy", 1);
@@ -46,6 +47,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.get("/health", (_, res) => res.status(200).send("ok"));
 
 // routes
+app.use("/ai", aiRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 
