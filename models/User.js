@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 export const userSchema = new mongoose.Schema({
   name: {
@@ -37,6 +38,8 @@ export const userSchema = new mongoose.Schema({
   avatar: String,
   avatarPublicId: String,
   passwordChangedAt: Date,
+  passwordResetToken: { type: String, index: true },
+  passwordResetExpiry: Date,
 });
 
 userSchema.pre("save", async function (next) {
@@ -61,6 +64,22 @@ userSchema.methods.changedPasswordAfter = function (JWTissuedAt) {
   );
 
   return JWTissuedAt < passwordChangedAtTimestamp;
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  // create temp reset token
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  // hash the reset token
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // store an expiry for 10 minutes from now
+  this.passwordResetExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
+  return resetToken;
 };
 
 const User = mongoose.model("User", userSchema);
