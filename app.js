@@ -7,7 +7,6 @@ import helmet from "helmet";
 import notFound from "./middlewares/notFound.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import { authRouter } from "./routes/authRouter.js";
-import { authenticate, restrict } from "./middlewares/authenticate.js";
 import { userRouter } from "./routes/userRouter.js";
 
 export const app = express();
