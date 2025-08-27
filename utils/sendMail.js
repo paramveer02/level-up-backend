@@ -12,7 +12,7 @@ export const sendMail = asyncWrapper(async function (options) {
   });
 
   const mailOptions = {
-    from: "Paramveer Marwah. finalCommitOrg@balance.com",
+    from: "Ciro Chen. finalCommitOrg@balance.com",
     to: options.email,
     subject: options.subject,
     text: options.message,

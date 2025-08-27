@@ -77,7 +77,6 @@ export const forgotPassword = asyncWrapper(async function (req, res) {
     // if mail send fails
     user.passwordResetToken = undefined;
     user.passwordResetExpiry = undefined;
-    user.save({ validateBeforeSave: false });
     await user.save({ validateBeforeSave: false });
 
     res.status(500).json({
