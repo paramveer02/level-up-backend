@@ -18,3 +18,8 @@ export const makeAdmin = asyncWrapper(async function (req, res) {
 
   res.status(StatusCodes.OK).json({ status: "success", data: { user } });
 });
+
+export const getCurrentUser = asyncWrapper(async function (req, res) {
+  const user = await User.findById(req.user.id);
+  res.status(StatusCodes.OK).json({ status: "success", user });
+});
