@@ -1,7 +1,7 @@
 // controllers/aiController.js
 import { ai } from "../utils/aiClient.js";
 import { getGoogleText, stripFences } from "../helpers/googleText.js";
-import { habitBase } from "../utils/habitBase.js";
+import { habitBase } from "../dev-data/habitBase.js";
 
 export async function aiPing(req, res, next) {
   try {
@@ -193,20 +193,20 @@ export async function aiCalculate(req, res, next) {
   try {
     const weeklyAllowances = req.body || {};
 
-    const allowanceSheet = weeklyAllowances.map((i) => ({
-      name: String(i?.name || "other")
-        .toLowerCase()
-        .slice(0, 20),
-      category: String(i?.category || "other")
-        .toLowerCase()
-        .slice(0, 20),
-      frequency: Math.max(0, Math.min(14, Number(i?.frequency) || 0)),
-      weight: Math.min(-1, Math.max(-5, -Math.abs(Number(i?.weight) || -1))),
-    }));
+    // const allowanceSheet = weeklyAllowances.map((i) => ({
+    //   name: String(i?.name || "other")
+    //     .toLowerCase()
+    //     .slice(0, 20),
+    //   category: String(i?.category || "other")
+    //     .toLowerCase()
+    //     .slice(0, 20),
+    //   frequency: Math.max(0, Math.min(14, Number(i?.frequency) || 0)),
+    //   weight: Math.min(-1, Math.max(-5, -Math.abs(Number(i?.weight) || -1))),
+    // }));
 
     const userName = req.user?.name || "Friend";
     //Calculate TNW
-    const TNW = allowanceSheet.reduce(
+    const TNW = weeklyAllowances.reduce(
       (sum, item) => sum + item.frequency * Math.abs(item.weight),
       0
     );
@@ -215,20 +215,22 @@ export async function aiCalculate(req, res, next) {
     const prompt = [
       `You are a health balancing assistant for a wellness app. The user is trying to balance out some unhealthy weekly habits, which are provided below as a list of allowances.`,
       `Your task is to review the provided list of unhealthy allowances and suggest 10 realistic, guilt-free healthy habits that could help balance them out.`,
-      `For each of the 5 healthy habits you suggest, you must provide a recommended weekly frequency. Make the frequencies realistic and achievable, generally between 1 and 3 times per week. Try to suggest habit frequencies that are similar to the frequencies of the unhealthy allowances, but focus on what is practical for most people. Prioritize habits that are easy to integrate into a busy lifestyle. Prioritize exercise, nutrition and hydration habits.`,
+      `For each of the 5 to 7 healthy habits you suggest, you must provide a recommended weekly frequency. Make the frequencies realistic and achievable, generally between 1 and 3 times per week. Try to suggest habit frequencies that are similar to the frequencies of the unhealthy allowances, but focus on what is practical for most people. Prioritize habits that are easy to integrate into a busy lifestyle. Prioritize exercise, nutrition and hydration habits.`,
       `All suggested habits must be selected from the provided 'habitBase' list.`,
-      `Return your response as a strict JSON array of objects. Each object in the array must have the following keys:`,
+      `Return your suggested habits as a strict JSON array of objects. Each object in the array must have the following keys:`,
       `• "name": A string representing the name of the healthy habit.`,
+      `• "emoji": An emoji representing the healthy habit,following the emoji defined in the habitBase.`,
       `• "category": A string representing the category of the habit.`,
       `• "frequency": An integer between 1 and 7, representing the suggested weekly frequency.`,
       `•	"weight" : A positive integer, following the weights defined in the habitBase.`,
-      `Add a weekly allowance analysis summary at the start of your response, evaluate the weekly allowances and mention from which aspects the user should work on to balance it out. Keep it really concise and possitive, no more than 50 words. Add some scientific reasoning behind your theory.`,
-      `Return your response as a strict JSON object which has the following key:`,
+      `Give this Strict JSON array the key "plan".`,
+      `Also give a weekly allowance analysis summary, evaluate the weekly allowances and mention from which aspects the user should work on to balance it out. Keep it really concise and possitive, no more than 50 words. Add some scientific reasoning behind your theory.`,
+      `Return all your responses as a strict JSON object which has the following key:`,
       `"summary": A string with the weekly allowance analysis summary.`,
-      `This will be the first object item in your response.`,
+      `"plan": The array of suggested healthy habits with their recommended frequencies.`,
       `Do not include any other text, explanations, or code fences in your response.`,
       `User name: ${userName}`,
-      `User's weekly allowances: ${JSON.stringify(allowanceSheet)}`,
+      `User's weekly allowances: ${JSON.stringify(weeklyAllowances)}`,
       `Available healthy habits: ${JSON.stringify(habitBase)}`,
     ].join("\n");
 
@@ -239,24 +241,31 @@ export async function aiCalculate(req, res, next) {
     });
 
     const raw = getGoogleText(resp); // JSON string
-    const suggestedHabits = JSON.parse(stripFences(raw)); // parse to object
+    // console.log("Raw AI Response:", raw);
+    const aiRespData = JSON.parse(stripFences(raw)); // parse to object
+    // console.log("aiRespData:", aiRespData);
+    const suggestedHabits = aiRespData.plan || [];
+    const summary = aiRespData.summary || "";
+    // console.log("Suggested Habits:", suggestedHabits);
+
     //Calculate TNW and TPW
-    let plan = [];
+    let balanceMoves = [];
     let currentTPW = 0;
     //Iterate over suggested habits and add them to the plan until maxTPW is reached
     for (const habit of suggestedHabits) {
       if (currentTPW >= maxTPW) break;
       const habitWeight = habit.frequency * habit.weight || 0;
       if (currentTPW + habitWeight < maxTPW) {
-        plan.push(habit);
+        balanceMoves.push(habit);
         currentTPW += habitWeight;
       }
     }
     return res.status(200).json({
       user: { name: userName },
-      weeklyAllowances: allowanceSheet,
+      weeklyAllowances: weeklyAllowances,
+      summary,
       TNW,
-      plan,
+      balanceMoves,
       currentTPW,
     });
   } catch (err) {
