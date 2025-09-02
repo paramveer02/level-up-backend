@@ -8,6 +8,7 @@
     "start": "node server.js",
     "dev": "NODE_ENV=development nodemon server.js",
     "project-setup": "npm i",
+    "seed:allowances": "node scripts/seedCatalog.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

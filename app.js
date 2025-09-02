@@ -9,6 +9,7 @@ import errorHandler from "./middlewares/errorHandler.js";
 import { authRouter } from "./routes/authRouter.js";
 import { userRouter } from "./routes/userRouter.js";
 import aiRouter from "./routes/aiRouter.js";
+import { allowancesRouter } from "./routes/catalogRouter.js";
 
 export const app = express();
 app.set("trust proxy", 1);
@@ -49,6 +50,7 @@ app.get("/health", (_, res) => res.status(200).send("ok"));
 app.use("/ai", aiRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/allowances", allowancesRouter);
 
 // error handler
 app.use(notFound);
