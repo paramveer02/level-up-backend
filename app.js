@@ -10,6 +10,7 @@ import { authRouter } from "./routes/authRouter.js";
 import { userRouter } from "./routes/userRouter.js";
 import aiRouter from "./routes/aiRouter.js";
 import { allowancesRouter } from "./routes/catalogRouter.js";
+import planRouter from "./routes/planRouter.js";
 
 export const app = express();
 app.set("trust proxy", 1);
@@ -51,6 +52,7 @@ app.use("/ai", aiRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/allowances", allowancesRouter);
+app.use("/api/v1/plan", planRouter);
 
 // error handler
 app.use(notFound);

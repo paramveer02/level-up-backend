@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const indulgenceItemSchema = new mongoose.Schema({
   key: { type: String, unique: true },
   name: { type: String, required: true },
-  frequency: { type: Number, defaultValue: 0 },
+  frequency: { type: Number, default: 0 },
   emoji: String,
   categoryId: {
     type: mongoose.Types.ObjectId,

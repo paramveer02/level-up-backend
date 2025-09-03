@@ -17,10 +17,6 @@ allowancesRouter.get("/indulgences", async (req, res) => {
   );
   items.forEach((i) => itemsByCat[i.categoryId.toString()]?.push(i));
 
-  console.log(
-    await IndulgenceCategory.find({ active: true }).sort({ sort: -1 })
-  );
-
   const grouped = cats.map((c) => ({
     _id: c._id,
     key: c.key,
