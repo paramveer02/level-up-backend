@@ -20,197 +20,28 @@ export async function aiPing(req, res, next) {
   }
 }
 
-export async function aiPlan(req, res, next) {
-  try {
-    const { indulgences = [] } = req.body || {};
-
-    const clean = indulgences.slice(0, 6).map((i) => ({
-      category: String(i?.category || "other")
-        .toLowerCase()
-        .slice(0, 20),
-      timesPerWeek: Math.max(0, Math.min(14, Number(i?.timesPerWeek) || 0)),
-    }));
-
-    const userName = req.user?.name || "Friend";
-    const habitBase = [
-      {
-        name: "30-min Cardio Workout",
-        frequency: { times: 3, period: "week" },
-        category: "exercise",
-        weight: 8,
-        xp: 10,
-      },
-      {
-        name: "30-min Strength Training",
-        frequency: { times: 2, period: "week" },
-        category: "exercise",
-        weight: 9,
-        xp: 20,
-      },
-      {
-        name: "Cooked Healthy Meal",
-        frequency: { times: 4, period: "week" },
-        category: "food",
-        weight: 5,
-        xp: 5,
-      },
-      {
-        name: "Walk 20 mins After Dinner",
-        frequency: { times: 3, period: "week" },
-        category: "exercise",
-        weight: 3,
-        xp: 10,
-      },
-      {
-        name: "7+ Hours of Sleep",
-        frequency: { times: 5, period: "week" },
-        category: "sleep",
-        weight: 2,
-        xp: 10,
-      },
-      {
-        name: "No Screens 60 min Before Bed",
-        frequency: { times: 3, period: "week" },
-        category: "sleep",
-        weight: 2,
-        xp: 10,
-      },
-      {
-        name: "10-min Mobility/Stretch",
-        frequency: { times: 3, period: "week" },
-        category: "mobility",
-        weight: 2,
-        xp: 10,
-      },
-      {
-        name: "2L Water Intake",
-        frequency: { times: 5, period: "week" },
-        category: "hydration",
-        weight: 1,
-        xp: 10,
-      },
-      {
-        name: "10-min Mindfulness/Meditation",
-        frequency: { times: 2, period: "week" },
-        category: "mental",
-        weight: 1,
-        xp: 10,
-      },
-      {
-        name: "High-Protein Breakfast",
-        frequency: { times: 0, period: "week" },
-        category: "food",
-        weight: 2,
-      },
-      {
-        name: "Add One Fruit Serving",
-        frequency: { times: 0, period: "week" },
-        category: "food",
-        weight: 1,
-      },
-      {
-        name: "Add One Veg Serving",
-        frequency: { times: 0, period: "week" },
-        category: "food",
-        weight: 1,
-      },
-      {
-        name: "15-min Sunlight Exposure",
-        frequency: { times: 0, period: "week" },
-        category: "sunlight",
-        weight: 2,
-      },
-      {
-        name: "Posture Breaks (2×/day)",
-        frequency: { times: 0, period: "week" },
-        category: "mobility",
-        weight: 1,
-      },
-      {
-        name: "Alcohol-Free Social Night",
-        frequency: { times: 0, period: "week" },
-        category: "social",
-        weight: 3,
-      },
-      {
-        name: "Take the Stairs",
-        frequency: { times: 0, period: "week" },
-        category: "exercise",
-        weight: 1,
-      },
-      {
-        name: "Meal Prep Two Lunches",
-        frequency: { times: 0, period: "week" },
-        category: "food",
-        weight: 4,
-      },
-      {
-        name: "Extra 5k Steps Day",
-        frequency: { times: 0, period: "week" },
-        category: "exercise",
-        weight: 3,
-      },
-      {
-        name: "5-min Gratitude Journal",
-        frequency: { times: 0, period: "week" },
-        category: "mental",
-        weight: 1,
-      },
-      {
-        name: "2-min Cold Shower",
-        frequency: { times: 0, period: "week" },
-        category: "recovery",
-        weight: 1,
-      },
-    ];
-    const prompt = [
-      "You are a positive, guilt-free wellness coach.",
-      "Return STRICT JSON with keys: summary, selectedHabits[], microActions[], motivation.",
-      `User name: ${userName}`,
-      `Create a personalized weekly wellness plan with 5 habbits selected from the ${habitBase} and saved in selectedHabits[]. The habits should be based on the user's indulgences and the base habits.`,
-      `Indulgences: ${JSON.stringify(clean)}`,
-      `Base habits: ${JSON.stringify(habitBase)}`,
-      "The plan should be realistic, achievable, and guilt-free.",
-    ].join("\n");
-
-    const resp = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      config: { responseMimeType: "application/json" },
-    });
-
-    const raw = getGoogleText(resp); // JSON string
-    const plan = JSON.parse(stripFences(raw)); // parse to object
-
-    return res
-      .status(200)
-      .json({ user: { name: userName }, indulgences: clean, plan });
-  } catch (err) {
-    next(err);
-  }
-}
 export async function aiCalculate(req, res, next) {
   try {
     const weeklyAllowances = req.body || {};
-
-    // const allowanceSheet = weeklyAllowances.map((i) => ({
-    //   name: String(i?.name || "other")
-    //     .toLowerCase()
-    //     .slice(0, 20),
-    //   category: String(i?.category || "other")
-    //     .toLowerCase()
-    //     .slice(0, 20),
-    //   frequency: Math.max(0, Math.min(14, Number(i?.frequency) || 0)),
-    //   weight: Math.min(-1, Math.max(-5, -Math.abs(Number(i?.weight) || -1))),
-    // }));
-
+    const { strategyId, userPreferences } = req.body;
     const userName = req.user?.name || "Friend";
+    const userId = req.user?.id;
+    
+    // Validate input
+    if (!Array.isArray(weeklyAllowances) || weeklyAllowances.length === 0) {
+      return res.status(400).json({ 
+        message: "Weekly allowances must be a non-empty array" 
+      });
+    }
+    
     //Calculate TNW
     const TNW = weeklyAllowances.reduce(
-      (sum, item) => sum + item.frequency * Math.abs(item.weight),
+      (sum, item) => sum + (item.frequency || 0) * Math.abs(item.weight || 1),
       0
     );
-    const maxTPW = TNW * 1.25;
+    
+    // Prevent division by zero and ensure minimum target
+    const maxTPW = Math.max(TNW * 1.25, 5); // Minimum 5 points target
     // AI generates a pool of suggestions.
     const prompt = [
       `You are a health balancing assistant for a wellness app. The user is trying to balance out some unhealthy weekly habits, which are provided below as a list of allowances.`,
@@ -251,11 +82,15 @@ export async function aiCalculate(req, res, next) {
     //Calculate TNW and TPW
     let balanceMoves = [];
     let currentTPW = 0;
+    
     //Iterate over suggested habits and add them to the plan until maxTPW is reached
     for (const habit of suggestedHabits) {
       if (currentTPW >= maxTPW) break;
-      const habitWeight = habit.frequency * habit.weight || 0;
-      if (currentTPW + habitWeight < maxTPW) {
+      
+      const habitWeight = (habit.frequency || 0) * (habit.weight || 0);
+      
+      // Include habits that don't exceed the target (changed from < to <=)
+      if (currentTPW + habitWeight <= maxTPW) {
         balanceMoves.push(habit);
         currentTPW += habitWeight;
       }

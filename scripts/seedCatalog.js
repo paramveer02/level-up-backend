@@ -44,7 +44,7 @@ async function main() {
       name: "Fast food meals",
       emoji: "📱",
       category: "food_drink",
-      defaultWeight: 4,
+      defaultWeight: -4,
       frequency: 5,
     },
     {
@@ -52,21 +52,21 @@ async function main() {
       name: "Sugary drinks / sodas",
       category: "food_drink",
       emoji: "📱",
-      defaultWeight: 3,
+      defaultWeight: -3,
     },
     {
       key: "desserts",
       name: "Desserts & sweets",
       category: "food_drink",
       emoji: "📱",
-      defaultWeight: 3,
+      defaultWeight: -3,
     },
     {
       key: "alcohol_night",
       name: "Alcohol at night",
       category: "food_drink",
       emoji: "📱",
-      defaultWeight: 4,
+      defaultWeight: -4,
     },
 
     // Screen & Tech
@@ -74,19 +74,19 @@ async function main() {
       key: "late_night_screen",
       name: "Late-night screen time",
       category: "screen_tech",
-      defaultWeight: 3,
+      defaultWeight: -3,
     },
     {
       key: "doomscroll",
       name: "Doomscrolling",
       category: "screen_tech",
-      defaultWeight: 3,
+      defaultWeight: -3,
     },
     {
       key: "gaming_binge",
       name: "Gaming binge",
       category: "screen_tech",
-      defaultWeight: 3,
+      defaultWeight: -3,
     },
 
     // Sleep
@@ -94,13 +94,13 @@ async function main() {
       key: "bed_after_midnight",
       name: "Bed after midnight",
       category: "sleep",
-      defaultWeight: 4,
+      defaultWeight: -4,
     },
     {
       key: "no_wind_down",
       name: "No wind-down routine",
       category: "sleep",
-      defaultWeight: 2,
+      defaultWeight: -2,
     },
 
     // Social & Party
@@ -108,13 +108,13 @@ async function main() {
       key: "party_night",
       name: "Party night",
       category: "social_party",
-      defaultWeight: 4,
+      defaultWeight: -4,
     },
     {
       key: "heavy_drinking",
       name: "Heavy drinking",
       category: "social_party",
-      defaultWeight: 5,
+      defaultWeight: -5,
     },
 
     // Sedentary
@@ -122,13 +122,13 @@ async function main() {
       key: "skip_workout",
       name: "Skip workout",
       category: "sedentary",
-      defaultWeight: 4,
+      defaultWeight: -4,
     },
     {
       key: "sit_8h_plus",
       name: "Sit > 8h",
       category: "sedentary",
-      defaultWeight: 3,
+      defaultWeight: -3,
     },
   ];
 

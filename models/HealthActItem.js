@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { setHealthActItemCompleted } from "./middlewares/healthActCompleted.js";
+import { setHealthActItemCompleted } from "../middlewares/healthActCompleted.js";
 
 const checkInSchema = new mongoose.Schema({
   date: { type: Date, required: true },

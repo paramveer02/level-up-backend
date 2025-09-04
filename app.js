@@ -12,6 +12,13 @@ import aiRouter from "./routes/aiRouter.js";
 import { allowancesRouter } from "./routes/catalogRouter.js";
 import { planRouter } from "./routes/planRouter.js";
 
+// Import models to ensure they're registered with Mongoose
+import "./models/User.js";
+import "./models/HealthActItem.js";
+import "./models/IndulgenceItem.js";
+import "./models/IndulgenceCategory.js";
+import "./models/HealthTrackingPlan.js";
+
 export const app = express();
 app.set("trust proxy", 1);
 
@@ -22,7 +29,9 @@ const __dirname = path.dirname(__filename);
 const allowedOrigins = [
   process.env.CLIENT_URL,
   "http://localhost:5173",
+  "http://localhost:5174",
   "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
 ].filter(Boolean);
 
 app.use(
