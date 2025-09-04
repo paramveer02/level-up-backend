@@ -31,7 +31,7 @@ export const authenticate = asyncWrapper(async function (req, res, next) {
     );
 
   req.user = {
-    id: user._id.toString(),
+    _id: user._id,
     name: user.name, // for ai controller
     email: user.email,
     role: user.role,
