@@ -32,7 +32,7 @@ const clamp = (n, min, max) =>
   Math.max(min, Math.min(max, Math.round(Number(n) || 0)));
 
 export const createOrActivatePlan = async (req, res) => {
-  const userId = req.user._id;
+  const userId = req.user.id;
   const weekStart = mondayStartUTC();
 
   const p = req.body?.plan || {};
@@ -77,7 +77,7 @@ export const getActivePlan = async (req, res) => {
     Vary: "Cookie",
   });
 
-  const userId = req.user._id;
+  const userId = req.user.id;
   const weekStart = mondayStartUTC();
 
   let planDoc = await WeeklyPlan.findOne({ userId, weekStart });
@@ -99,7 +99,8 @@ export const getActiveAct = async (req, res) => {
     Vary: "Cookie",
   });
 
-  const userId = req.user._id;
+  const userId = req.user.id;
+  console.log(`userId: ${userId}`);
   const planDoc = await WeeklyPlan.findOne({ userId, status: "ACTIVE" }).sort({
     weekStart: -1,
   });
@@ -123,7 +124,8 @@ export const getActiveAct = async (req, res) => {
 };
 
 export const checkIn = async (req, res) => {
-  const userId = req.user._id;
+  const userId = req.user.id;
+  console.log(userId);
   const { planId, actId } = req.params;
 
   const snap = await WeeklyPlan.findOne(
