@@ -64,7 +64,7 @@ export const forgotPassword = asyncWrapper(async function (req, res) {
     "host"
   )}/api/v1/auth/resetPassword/${resetToken}`;
 
-  const message = `Forgot your password? Submit a PATCH request with your new password and confirmPassword to: ${resetURL}.\nIf you didn't forget your password, please ignore this email.`;
+  const message = `Forgot your password? Submit a request with your new password to: ${resetURL}.\nIf you didn't forget your password, please ignore this email.`;
 
   try {
     await sendMail({
