@@ -60,7 +60,7 @@ export const forgotPassword = asyncWrapper(async function (req, res) {
   await user.save({ validateBeforeSave: false });
 
   // create reset URL - This URL willpoint to frontend page, not API endpoint
-  const frontendURL = process.env.FRONTEND_URL || 'http://localhost:5173';
+  const frontendURL = process.env.CLIENT_URL || 'http://localhost:5173';
   const resetURL = `${frontendURL}/reset-password/${resetToken}`;
 
   const message = `Forgot your password? Submit a request with your new password to: ${resetURL}.\nIf you didn't forget your password, please ignore this email.`;
