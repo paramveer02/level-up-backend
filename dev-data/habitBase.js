@@ -11,7 +11,7 @@ export const habitBase = [
     id: "strength-training",
     name: "30-min Strength Training",
     category: "exercise",
-    weight: 5,
+    weight: 4,
     emoji: "💪",
   },
   {
@@ -62,7 +62,7 @@ export const habitBase = [
     id: "healthy-meal",
     name: "Cook a Home-Made Meal",
     category: "food",
-    weight: 5,
+    weight: 4,
     emoji: "🥗",
   },
   {
