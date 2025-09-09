@@ -3,8 +3,7 @@ import { asyncWrapper } from "./asyncWrapper.js";
 
 export const sendMail = asyncWrapper(async function (options) {
   const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
+    service: "gmail",
     auth: {
       user: process.env.EMAIL_USERNAME,
       pass: process.env.EMAIL_PASSWORD,
@@ -12,7 +11,7 @@ export const sendMail = asyncWrapper(async function (options) {
   });
 
   const mailOptions = {
-    from: "Ciro Chen. finalCommitOrg@balance.com",
+    from: "Team Balance. paramveermarwahafc@gmail.com",
     to: options.email,
     subject: options.subject,
     text: options.message,
