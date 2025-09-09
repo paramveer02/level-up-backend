@@ -19,12 +19,13 @@ export const createPlan = async (req, res) => {
     // Check if user already has an active plan
     const existingPlan = await HealthTrackingPlan.findOne({
       userId,
-      completed: false
+      completed: false,
     });
 
     if (existingPlan) {
-      return res.status(400).json({ 
-        message: "You already have an active plan. Please terminate it before creating a new one." 
+      return res.status(400).json({
+        message:
+          "You already have an active plan. Please terminate it before creating a new one.",
       });
     }
 
@@ -62,7 +63,7 @@ export const createPlan = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Health tracking plan created successfully",
-      plan
+      plan,
     });
   } catch (error) {
     console.error("Create plan error:", error);
@@ -78,23 +79,25 @@ export const getCurrentPlan = async (req, res) => {
     // Find the most recent active plan (not completed)
     const plan = await HealthTrackingPlan.findOne({
       userId,
-      completed: false
-    }).populate({
-      path: 'healthActs.healthActId',
-      select: 'name emoji description weight categoryId',
-      options: { strictPopulate: false }
-    }).sort({ createdAt: -1 }); // Get the most recent plan
+      completed: false,
+    })
+      .populate({
+        path: "healthActs.healthActId",
+        select: "name emoji description weight categoryId",
+        options: { strictPopulate: false },
+      })
+      .sort({ createdAt: -1 }); // Get the most recent plan
 
     if (!plan) {
-      return res.status(404).json({
+      return res.status(204).json({
         success: false,
-        message: "No active plan found"
+        message: "No active plan found",
       });
     }
 
     res.json({
       success: true,
-      plan
+      plan,
     });
   } catch (error) {
     console.error("Get current plan error:", error);
@@ -109,7 +112,10 @@ export const getUserPlans = async (req, res) => {
     const { limit = 10, page = 1 } = req.query;
 
     const plans = await HealthTrackingPlan.find({ userId })
-      .populate('healthActs.healthActId', 'name emoji description weight categoryId')
+      .populate(
+        "healthActs.healthActId",
+        "name emoji description weight categoryId"
+      )
       .sort({ weekStartDate: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
@@ -121,7 +127,7 @@ export const getUserPlans = async (req, res) => {
       plans,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
-      total
+      total,
     });
   } catch (error) {
     console.error("Get user plans error:", error);
@@ -138,31 +144,31 @@ export const checkInHealthAct = async (req, res) => {
 
     const plan = await HealthTrackingPlan.findOne({
       _id: planId,
-      userId
+      userId,
     });
 
     if (!plan) {
       return res.status(404).json({
         success: false,
-        message: "Plan not found"
+        message: "Plan not found",
       });
     }
 
     const healthAct = plan.healthActs.find(
-      act => act._id.toString() === healthActId
+      (act) => act._id.toString() === healthActId
     );
 
     if (!healthAct) {
       return res.status(404).json({
         success: false,
-        message: "Health act not found in this plan"
+        message: "Health act not found in this plan",
       });
     }
 
     // Add check-in
     healthAct.checkIns.push({
       date: new Date(date),
-      completed: true
+      completed: true,
     });
 
     // Update completion status
@@ -178,8 +184,8 @@ export const checkInHealthAct = async (req, res) => {
         healthActId: healthAct.healthActId,
         completedCount,
         targetFrequency: healthAct.targetFrequency,
-        isCompleted: healthAct.isCompleted
-      }
+        isCompleted: healthAct.isCompleted,
+      },
     });
   } catch (error) {
     console.error("Check-in error:", error);
@@ -195,13 +201,13 @@ export const terminatePlan = async (req, res) => {
     // Find the most recent active plan (not completed)
     const plan = await HealthTrackingPlan.findOne({
       userId,
-      completed: false
+      completed: false,
     }).sort({ createdAt: -1 });
 
     if (!plan) {
       return res.status(404).json({
         success: false,
-        message: "No active plan found to terminate"
+        message: "No active plan found to terminate",
       });
     }
 
@@ -213,7 +219,7 @@ export const terminatePlan = async (req, res) => {
     res.json({
       success: true,
       message: "Plan terminated successfully",
-      plan
+      plan,
     });
   } catch (error) {
     console.error("Terminate plan error:", error);
@@ -229,24 +235,27 @@ export const getHealthActProgress = async (req, res) => {
 
     const plan = await HealthTrackingPlan.findOne({
       _id: planId,
-      userId
-    }).populate('healthActs.healthActId', 'name emoji description weight categoryId');
+      userId,
+    }).populate(
+      "healthActs.healthActId",
+      "name emoji description weight categoryId"
+    );
 
     if (!plan) {
       return res.status(404).json({
         success: false,
-        message: "Plan not found"
+        message: "Plan not found",
       });
     }
 
     const healthAct = plan.healthActs.find(
-      act => act._id.toString() === healthActId
+      (act) => act._id.toString() === healthActId
     );
 
     if (!healthAct) {
       return res.status(404).json({
         success: false,
-        message: "Health act not found in this plan"
+        message: "Health act not found in this plan",
       });
     }
 
@@ -255,8 +264,10 @@ export const getHealthActProgress = async (req, res) => {
       healthAct: {
         ...healthAct.toObject(),
         completedCount: healthAct.checkIns.length,
-        progressPercentage: Math.round((healthAct.checkIns.length / healthAct.targetFrequency) * 100)
-      }
+        progressPercentage: Math.round(
+          (healthAct.checkIns.length / healthAct.targetFrequency) * 100
+        ),
+      },
     });
   } catch (error) {
     console.error("Get health act progress error:", error);
