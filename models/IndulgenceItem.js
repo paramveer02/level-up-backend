@@ -15,5 +15,8 @@ const indulgenceItemSchema = new mongoose.Schema({
   active: { type: Boolean, default: true },
 });
 
+// Add compound index to speed active-category queries
+indulgenceItemSchema.index({ active: 1, categoryId: 1 });
+
 const IndulgenceItem = mongoose.model("IndulgenceItem", indulgenceItemSchema);
 export default IndulgenceItem;

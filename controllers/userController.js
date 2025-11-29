@@ -23,3 +23,32 @@ export const getCurrentUser = asyncWrapper(async function (req, res) {
   const user = await User.findById(req.user.id);
   res.status(StatusCodes.OK).json({ status: "success", user });
 });
+
+export const updateProfileImage = asyncWrapper(async function (req, res) {
+  // req.file is provided by multer
+  if (!req.file) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      success: false,
+      message: "No image file provided",
+    });
+  }
+
+  // Get user ID from authenticated session
+  const userId = req.user.id;
+
+  // Construct the file path/URL to store in database
+  const profileImagePath = `/uploads/profiles/${req.file.filename}`;
+
+  // Update user in database
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { profileImage: profileImagePath },
+    { new: true, runValidators: true }
+  ).select("-password");
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Profile image updated successfully",
+    user: user,
+  });
+});

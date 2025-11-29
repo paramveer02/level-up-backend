@@ -10,6 +10,9 @@ const indulgenceCategorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Add compound index to speed active + sort queries
+indulgenceCategorySchema.index({ active: 1, sort: 1 });
+
 const IndulgenceCategory = mongoose.model(
   "IndulgenceCategory",
   indulgenceCategorySchema

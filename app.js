@@ -28,6 +28,7 @@ const __dirname = path.dirname(__filename);
 // CORS
 const allowedOrigins = [
   process.env.CLIENT_URL,
+  "https://balance-frontend.onrender.com",
   "http://localhost:5173",
   "http://localhost:5174",
   "http://127.0.0.1:5173",
@@ -52,6 +53,7 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
 // Healthcheck
 app.get("/health", (_, res) => res.status(200).send("ok"));

@@ -37,6 +37,10 @@ export const userSchema = new mongoose.Schema({
   },
   avatar: String,
   avatarPublicId: String,
+  profileImage: {
+    type: String,
+    default: null,
+  },
   passwordChangedAt: Date,
   passwordResetToken: { type: String, index: true },
   passwordResetExpiry: Date,

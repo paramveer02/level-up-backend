@@ -3,7 +3,6 @@ import HealthActItem from "../models/HealthActItem.js";
 
 export const createPlan = async (req, res) => {
   try {
-    console.log("Create plan request body:", req.body);
     const { weekStartDate, indulgences, healthActs } = req.body;
     const userId = req.user.id;
 

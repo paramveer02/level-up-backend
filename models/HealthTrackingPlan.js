@@ -79,6 +79,11 @@ const healthTrackingPlanSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Performance indexes for common query patterns
+healthTrackingPlanSchema.index({ userId: 1, completed: 1 });
+healthTrackingPlanSchema.index({ userId: 1, weekStartDate: -1 });
+healthTrackingPlanSchema.index({ userId: 1, createdAt: -1 });
+
 // Auto-check if the plan is completed
 healthTrackingPlanSchema.pre("save", setPlanCompleted);
 

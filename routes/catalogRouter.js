@@ -7,8 +7,8 @@ export const allowancesRouter = express.Router();
 
 allowancesRouter.get("/indulgences", async (req, res) => {
   const [cats, items] = await Promise.all([
-    IndulgenceCategory.find({ active: true }).sort({ sort: 1 }),
-    IndulgenceItem.find({ active: true }),
+    IndulgenceCategory.find({ active: true }).sort({ sort: 1 }).lean(),
+    IndulgenceItem.find({ active: true }).lean(),
   ]);
 
   // group items by category for easy rendering
@@ -16,10 +16,6 @@ allowancesRouter.get("/indulgences", async (req, res) => {
     cats.map((c) => [c._id.toString(), []])
   );
   items.forEach((i) => itemsByCat[i.categoryId.toString()]?.push(i));
-
-  console.log(
-    await IndulgenceCategory.find({ active: true }).sort({ sort: -1 })
-  );
 
   const grouped = cats.map((c) => ({
     _id: c._id,
