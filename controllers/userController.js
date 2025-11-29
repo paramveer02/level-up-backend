@@ -21,7 +21,15 @@ export const makeAdmin = asyncWrapper(async function (req, res) {
 
 export const getCurrentUser = asyncWrapper(async function (req, res) {
   const user = await User.findById(req.user.id);
-  res.status(StatusCodes.OK).json({ status: "success", user });
+  
+  // Add absolute URL for profile image if it exists
+  const userResponse = user.toObject();
+  if (userResponse.profileImage) {
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    userResponse.profileImageUrl = `${baseUrl}${userResponse.profileImage}`;
+  }
+  
+  res.status(StatusCodes.OK).json({ status: "success", user: userResponse });
 });
 
 export const updateProfileImage = asyncWrapper(async function (req, res) {
@@ -46,9 +54,14 @@ export const updateProfileImage = asyncWrapper(async function (req, res) {
     { new: true, runValidators: true }
   ).select("-password");
 
+  // Add absolute URL for immediate frontend use
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  const userResponse = user.toObject();
+  userResponse.profileImageUrl = `${baseUrl}${profileImagePath}`;
+
   res.status(StatusCodes.OK).json({
     success: true,
     message: "Profile image updated successfully",
-    user: user,
+    user: userResponse,
   });
 });
